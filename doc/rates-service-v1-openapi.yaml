@@ -1,0 +1,298 @@
+openapi: 3.1.0
+info:
+  title: Microservicio de Gestión de Tarifas
+  description: API para gestionar tarifas de productos
+  contact:
+    name: Carlos
+    email: Carlosgd993@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+tags:
+- name: Rates
+  description: API para la gestión de tarifas
+paths:
+  /api/v1/rates:
+    post:
+      tags:
+      - Rates
+      summary: Crear una nueva tarifa
+      description: Crea una nueva tarifa con los datos proporcionados
+      operationId: createRate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RateRequest"
+        required: true
+      responses:
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: object
+        "201":
+          description: Tarifa creada correctamente
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Datos de entrada inválidos
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/rates/{rateId}:
+    get:
+      tags:
+      - Rates
+      summary: Buscar tarifa por ID
+      description: Obtiene una tarifa específica por su identificador
+      operationId: findRateById
+      parameters:
+      - name: rateId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Tarifa no encontrada
+          content:
+            '*/*':
+              schema:
+                type: object
+        "200":
+          description: Tarifa encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateResponse"
+    patch:
+      tags:
+      - Rates
+      summary: Actualizar precio de tarifa
+      description: Actualiza el precio y moneda de una tarifa existente
+      operationId: updateRatePrice
+      parameters:
+      - name: rateId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+      - name: price
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+          minimum: 0
+      - name: currencyCode
+        in: query
+        required: true
+        schema:
+          type: string
+          maxLength: 3
+          minLength: 3
+          pattern: "[A-Z]{3}"
+      responses:
+        "404":
+          description: Tarifa no encontrada
+          content:
+            '*/*':
+              schema:
+                type: object
+        "204":
+          description: Precio actualizado correctamente
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Datos de entrada inválidos
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/rates/search:
+    get:
+      tags:
+      - Rates
+      summary: "Buscar tarifa por fecha, producto y marca"
+      description: "Obtiene una tarifa específica filtrando por fecha, ID de producto\
+        \ y ID de marca"
+      operationId: findRateByDateAndProductAndBrand
+      parameters:
+      - name: date
+        in: query
+        required: true
+        schema:
+          type: string
+          pattern: "\\d{4}-\\d{2}-\\d{2}"
+      - name: productId
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+      - name: brandId
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+      responses:
+        "404":
+          description: Tarifa no encontrada
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Parámetros de búsqueda inválidos
+          content:
+            '*/*':
+              schema:
+                type: object
+        "200":
+          description: Tarifa encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateResponse"
+  /api/v1/rates/{id}:
+    delete:
+      tags:
+      - Rates
+      summary: Eliminar tarifa
+      description: Elimina una tarifa por su identificador
+      operationId: deleteRateById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Tarifa no encontrada
+          content:
+            '*/*':
+              schema:
+                type: object
+        "204":
+          description: Tarifa eliminada correctamente
+          content:
+            '*/*':
+              schema:
+                type: object
+components:
+  schemas:
+    RateRequest:
+      type: object
+      description: DTO para crear una tarifa
+      example:
+        brandId: 1
+        productId: 35455
+        startDate: 2024-01-01
+        endDate: 2024-05-31
+        price: 3550
+        currencyCode: EUR
+      properties:
+        brandId:
+          type: integer
+          format: int64
+          description: Identificador único de la marca
+          example: 1
+          minimum: 1
+        productId:
+          type: integer
+          format: int64
+          description: Identificador único del producto
+          example: 1
+        startDate:
+          type: string
+          description: Fecha de inicio de aplicación de la tarifa
+          example: 2020-01-01
+          pattern: "\\d{4}-\\d{2}-\\d{2}"
+        endDate:
+          type: string
+          description: Fecha de fin de aplicación de la tarifa
+          example: 2020-05-31
+          pattern: "\\d{4}-\\d{2}-\\d{2}"
+        price:
+          type: integer
+          format: int64
+          description: Precio del producto
+          example: 1234
+          minimum: 1
+        currencyCode:
+          type: string
+          description: ID de la moneda
+          example: EUR
+          maxLength: 3
+          minLength: 3
+          pattern: "^[A-Z]{3}$"
+      required:
+      - brandId
+      - currencyCode
+      - endDate
+      - price
+      - productId
+      - startDate
+    RateResponse:
+      type: object
+      description: DTO de respuesta de una tarifa
+      example:
+        id: 1
+        brandId: 1
+        productId: 35455
+        startDate: 2024-01-01
+        endDate: 2024-05-31
+        price: 35.50€
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identificador único de la tarifa
+          example: 1
+        brandId:
+          type: integer
+          format: int64
+          description: Identificador de la marca
+          example: 1
+        productId:
+          type: integer
+          format: int64
+          description: Identificador del producto
+          example: 35455
+        startDate:
+          type: string
+          format: date
+          description: Fecha de inicio de la tarifa
+          example: 2020-01-01
+        endDate:
+          type: string
+          format: date
+          description: Fecha de fin de la tarifa
+          example: 2020-05-31
+        price:
+          type: string
+          description: Precio formateado
+          example: 35.50€
+      required:
+      - brandId
+      - endDate
+      - id
+      - price
+      - productId
+      - startDate

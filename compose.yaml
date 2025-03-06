@@ -1,0 +1,25 @@
+services:
+  prism:
+    image: stoplight/prism:latest
+    container_name: prism-mock-server
+    ports:
+      - "4010:4010" # Mapea el puerto 4010 del contenedor al puerto 4010 del host
+    volumes:
+      - ./currency-service-api-rest.yml:/tmp/currency-service-api-rest.yml # Monta tu archivo OpenAPI en el contenedor
+    command: mock -h 0.0.0.0 /tmp/currency-service-api-rest.yml # Comando para ejecutar Prism
+    restart: unless-stopped # Reinicia el contenedor a menos que se detenga manualmente
+  postgres:
+    image: postgres:latest
+    container_name: postgreContainer
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: exercicedb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data
+volumes:
+  postgres_data:

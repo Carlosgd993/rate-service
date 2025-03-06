@@ -1,0 +1,25 @@
+rate_service
+├── application
+│   ├── dto
+│   │   ├── RateRequestDto.java
+│   │   └── RateResponseDTO.java
+│   └── ports
+│       ├── RateRepositoryJpa.java
+│       └── RateService.java
+├── config
+│   └── WebClientConfig.java
+├── domain
+│   ├── exception
+│   │   ├── GlobalExceptionHandler.java
+│   │   └── ValidationExceptionHandler.java
+│   └── model
+│       ├── Currency.java
+│       └── Rate.java
+├── infrastructure
+│   └── adapter
+│       ├── api
+│       │   └── RateController.java
+│       └── service
+│           ├── CurrencyService.java
+│           └── RateServiceImpl.java
+└── RateServiceApplication.java
